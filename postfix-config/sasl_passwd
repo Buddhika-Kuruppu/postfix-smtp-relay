@@ -1,0 +1,4 @@
+# /etc/postfix/sasl_passwd
+# Format: [smtp.office365.com]:587 username:password
+
+[smtp.office365.com]:587 user@yourdomain.com:your-password
