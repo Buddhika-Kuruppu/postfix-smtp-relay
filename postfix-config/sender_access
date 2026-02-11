@@ -1,0 +1,20 @@
+# /etc/postfix/sender_access
+# Controls which senders are allowed to relay through this server.
+# Format: pattern ACTION
+#
+# Actions: OK, REJECT, DUNNO, HOLD, DISCARD
+#
+# Examples:
+#   user@yourdomain.com        OK
+#   yourdomain.com             OK
+#   spammer@example.com        REJECT
+#
+# After editing, rebuild the hash map and reload Postfix:
+#   sudo postmap /etc/postfix/sender_access
+#   sudo systemctl reload postfix
+
+# Allow specific senders or domains
+yourdomain.com        OK
+
+# Reject everything else (uncomment to enforce a strict allowlist)
+# *                     REJECT Not authorized to send via this relay

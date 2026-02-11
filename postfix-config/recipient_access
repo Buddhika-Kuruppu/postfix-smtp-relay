@@ -1,0 +1,20 @@
+# /etc/postfix/recipient_access
+# Controls which recipients are allowed when relaying through this server.
+# Format: pattern ACTION
+#
+# Actions: OK, REJECT, DUNNO, HOLD, DISCARD
+#
+# Examples:
+#   user@example.com           OK
+#   example.com                OK
+#   badactor@example.com       REJECT
+#
+# After editing, rebuild the hash map and reload Postfix:
+#   sudo postmap /etc/postfix/recipient_access
+#   sudo systemctl reload postfix
+
+# Allow specific recipients or domains
+yourdomain.com        OK
+
+# Reject everything else (uncomment to enforce a strict allowlist)
+# *                     REJECT Recipient not allowed via this relay
