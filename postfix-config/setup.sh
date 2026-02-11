@@ -27,19 +27,25 @@ fi
 
 echo "--- Copying new configuration ---"
 # Ensure the config files exist in the current directory
-if [ ! -f main.cf ] || [ ! -f sasl_passwd ]; then
-    echo "Error: main.cf or sasl_passwd not found in current directory."
+if [ ! -f main.cf ] || [ ! -f sasl_passwd ] || [ ! -f sender_access ] || [ ! -f recipient_access ]; then
+    echo "Error: main.cf, sasl_passwd, sender_access, or recipient_access not found in current directory."
     exit 1
 fi
 
 cp main.cf /etc/postfix/main.cf
 cp sasl_passwd /etc/postfix/sasl_passwd
+cp sender_access /etc/postfix/sender_access
+cp recipient_access /etc/postfix/recipient_access
 
 echo "--- Configuring permissions and hashing credentials ---"
 chmod 600 /etc/postfix/sasl_passwd
 postmap /etc/postfix/sasl_passwd
 # Resulting database also needs to be secure
 chmod 600 /etc/postfix/sasl_passwd.db
+
+echo "--- Building restriction hash maps ---"
+postmap /etc/postfix/sender_access
+postmap /etc/postfix/recipient_access
 
 echo "--- Restarting Postfix ---"
 systemctl restart postfix
