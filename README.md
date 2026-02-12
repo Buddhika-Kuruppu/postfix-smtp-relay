@@ -93,7 +93,31 @@ During installation, select **"Internet Site"** when prompted and enter your ser
 ![Postfix System Mail Name](images/postfix-mail-name.jpg)
 *Enter your server's fully qualified domain name*
 
-### 2. Configure Postfix Main Settings
+> **Tip:** To skip the interactive prompts, pre-seed the configuration before installing:
+> ```bash
+> sudo debconf-set-selections <<< "postfix postfix/mailname string $(hostname -f)"
+> sudo debconf-set-selections <<< "postfix postfix/main_mailer_type string 'Internet Site'"
+> sudo apt install -y postfix libsasl2-modules mailutils
+> ```
+
+### 2. Deploy Configuration Files
+
+Back up any existing Postfix configuration:
+
+```bash
+sudo cp /etc/postfix/main.cf /etc/postfix/main.cf.bak
+```
+
+Copy the configuration files from this repository to Postfix:
+
+```bash
+sudo cp postfix-config/main.cf /etc/postfix/main.cf
+sudo cp postfix-config/sasl_passwd /etc/postfix/sasl_passwd
+sudo cp postfix-config/sender_access /etc/postfix/sender_access
+sudo cp postfix-config/recipient_access /etc/postfix/recipient_access
+```
+
+### 3. Configure Postfix Main Settings
 
 Edit the main configuration file:
 
@@ -134,7 +158,7 @@ smtp_sasl_security_options = noanonymous
 smtp_use_tls = yes
 ```
 
-### 3. Configure SMTP Credentials
+### 4. Configure SMTP Credentials
 
 Create the password file:
 
@@ -156,7 +180,14 @@ sudo chmod 600 /etc/postfix/sasl_passwd /etc/postfix/sasl_passwd.db
 sudo chown root:root /etc/postfix/sasl_passwd /etc/postfix/sasl_passwd.db
 ```
 
-### 4. Restart Postfix
+Build the sender and recipient restriction hash maps:
+
+```bash
+sudo postmap /etc/postfix/sender_access
+sudo postmap /etc/postfix/recipient_access
+```
+
+### 5. Restart Postfix
 
 ```bash
 sudo systemctl restart postfix
