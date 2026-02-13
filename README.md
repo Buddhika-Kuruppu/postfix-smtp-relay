@@ -382,12 +382,6 @@ The recipient should receive the email in their inbox:
 
 ## Screenshots
 
-This repository includes placeholder references for the following screenshots. To add your own:
-
-1. Capture screenshots during your setup process
-2. Save them as JPEG files in the `images/` directory
-3. Use the following filenames:
-
 | Filename | Description |
 |----------|-------------|
 | `postfix-install-type.jpg` | Postfix installation dialog showing "Internet Site" selection |
