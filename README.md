@@ -379,21 +379,3 @@ The recipient should receive the email in their inbox:
 
 ![Email received in inbox](images/email-received.jpg)
 *Test email received in recipient's inbox*
-
-## Screenshots
-
-| Filename | Description |
-|----------|-------------|
-| `postfix-install-type.jpg` | Postfix installation dialog showing "Internet Site" selection |
-| `postfix-mail-name.jpg` | System mail name configuration prompt |
-| `postfix-main-cf.jpg` | The main.cf file open in an editor |
-| `gmail-app-password.jpg` | Google Account App Password generation page |
-| `send-test-email.jpg` | Terminal showing the mail command |
-| `mailq-output.jpg` | Output of the mailq command |
-| `mail-log.jpg` | Contents of /var/log/mail.log |
-| `successful-delivery.jpg` | Log showing successful delivery status |
-| `email-received.jpg` | Screenshot of received email in inbox |
-
-## License
-
-MIT License
