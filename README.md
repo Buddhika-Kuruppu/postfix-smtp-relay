@@ -61,22 +61,36 @@ sequenceDiagram
 
 ```mermaid
 flowchart TD
-    A[1. Install Postfix] --> B[2. Configure main.cf]
-    B --> C[3. Set SMTP Credentials]
-    C --> D[4. Secure Password File]
-    D --> E[5. Restart Postfix]
-    E --> F[6. Test Email Delivery]
+    A[1. Install Postfix] --> A2[2. Create Admin User]
+    A2 --> B[3. Configure main.cf]
+    B --> C[4. Set SMTP Credentials]
+    C --> D[5. Secure Password File]
+    D --> E[6. Restart Postfix]
+    E --> F[7. Test Email Delivery]
     F --> G{Success?}
     G -->|Yes| H[Ready to Use!]
     G -->|No| I[Check Troubleshooting]
     I --> B
 
     style A fill:#1976d2,stroke:#0d47a1,color:#fff
+    style A2 fill:#7b1fa2,stroke:#4a148c,color:#fff
     style H fill:#4caf50,stroke:#388e3c,color:#fff
     style I fill:#ff9800,stroke:#f57c00,color:#000
 ```
 
-## Installation
+## Automated Deployment
+
+For a fully automated setup, use the deployment script:
+
+```bash
+git clone https://github.com/Buddhika-Kuruppu/postfix-smtp-relay.git
+cd postfix-smtp-relay
+sudo bash deploy.sh
+```
+
+The script will interactively prompt for all configuration values including the admin user, SMTP credentials, and relay settings.
+
+## Manual Installation
 
 ### 1. Update System and Install Postfix
 
@@ -100,7 +114,62 @@ During installation, select **"Internet Site"** when prompted and enter your ser
 > sudo apt install -y postfix libsasl2-modules mailutils
 > ```
 
-### 2. Deploy Configuration Files
+### 2. Create Dedicated Admin User
+
+Create a dedicated user for managing the Postfix relay instead of using root directly:
+
+```bash
+sudo useradd --create-home --shell /bin/bash --comment "Postfix SMTP Relay Admin" postfix-admin
+sudo passwd postfix-admin
+```
+
+Add the user to the `postfix` group so it can read Postfix configs and view the queue:
+
+```bash
+sudo usermod -aG postfix postfix-admin
+```
+
+Grant limited sudo access for Postfix management only:
+
+```bash
+sudo visudo -f /etc/sudoers.d/postfix-admin
+```
+
+Add the following rules:
+
+```
+# Postfix SMTP Relay — admin privileges for postfix-admin
+postfix-admin ALL=(root) NOPASSWD: /usr/sbin/postfix *
+postfix-admin ALL=(root) NOPASSWD: /usr/sbin/postmap *
+postfix-admin ALL=(root) NOPASSWD: /usr/sbin/postconf *
+postfix-admin ALL=(root) NOPASSWD: /usr/sbin/postsuper *
+postfix-admin ALL=(root) NOPASSWD: /usr/bin/systemctl restart postfix
+postfix-admin ALL=(root) NOPASSWD: /usr/bin/systemctl reload postfix
+postfix-admin ALL=(root) NOPASSWD: /usr/bin/systemctl status postfix
+postfix-admin ALL=(root) NOPASSWD: /usr/bin/systemctl stop postfix
+postfix-admin ALL=(root) NOPASSWD: /usr/bin/systemctl start postfix
+postfix-admin ALL=(root) NOPASSWD: /usr/bin/journalctl -u postfix *
+postfix-admin ALL=(root) NOPASSWD: /usr/bin/tail -f /var/log/mail.log
+postfix-admin ALL=(root) NOPASSWD: /usr/bin/tail -n * /var/log/mail.log
+```
+
+Verify the sudoers syntax:
+
+```bash
+sudo visudo -cf /etc/sudoers.d/postfix-admin
+```
+
+> **What this user can do:**
+> - Start, stop, restart, and reload Postfix
+> - Rebuild hash maps (`postmap`), manage the queue (`postsuper`), view config (`postconf`)
+> - Read mail logs
+>
+> **What this user cannot do:**
+> - Install or remove packages
+> - Modify system files outside of Postfix commands
+> - Access root shell
+
+### 3. Deploy Configuration Files
 
 Back up any existing Postfix configuration:
 
@@ -117,7 +186,7 @@ sudo cp postfix-config/sender_access /etc/postfix/sender_access
 sudo cp postfix-config/recipient_access /etc/postfix/recipient_access
 ```
 
-### 3. Configure Postfix Main Settings
+### 4. Configure Postfix Main Settings
 
 Edit the main configuration file:
 
@@ -158,7 +227,7 @@ smtp_sasl_security_options = noanonymous
 smtp_use_tls = yes
 ```
 
-### 4. Configure SMTP Credentials
+### 5. Configure SMTP Credentials
 
 Create the password file:
 
@@ -187,7 +256,7 @@ sudo postmap /etc/postfix/sender_access
 sudo postmap /etc/postfix/recipient_access
 ```
 
-### 5. Restart Postfix
+### 6. Restart Postfix
 
 ```bash
 sudo systemctl restart postfix
@@ -353,11 +422,12 @@ sudo journalctl -u postfix -f
 
 ## Security Considerations
 
-1. **Restrict relay access** - Only allow trusted networks in `mynetworks`
-2. **Use TLS** - Always encrypt SMTP connections
-3. **Protect credentials** - Ensure proper file permissions on `sasl_passwd`
-4. **Rate limiting** - Configure rate limits to prevent abuse
-5. **Monitor logs** - Regularly check for unauthorized relay attempts
+1. **Use a dedicated admin user** - Never manage Postfix as root; use the `postfix-admin` user with scoped sudo
+2. **Restrict relay access** - Only allow trusted networks in `mynetworks`
+3. **Use TLS** - Always encrypt SMTP connections
+4. **Protect credentials** - Ensure proper file permissions on `sasl_passwd`
+5. **Rate limiting** - Configure rate limits to prevent abuse
+6. **Monitor logs** - Regularly check for unauthorized relay attempts
 
 ## Firewall Configuration
 
