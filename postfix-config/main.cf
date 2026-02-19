@@ -27,6 +27,9 @@ recipient_delimiter = +
 inet_interfaces = loopback-only
 inet_protocols = all
 
+# Client IP restrictions
+smtpd_client_restrictions = check_client_access hash:/etc/postfix/client_ip_access
+
 # Sender and recipient restrictions
 smtpd_sender_restrictions = check_sender_access hash:/etc/postfix/sender_access
 smtpd_recipient_restrictions = check_recipient_access hash:/etc/postfix/recipient_access
