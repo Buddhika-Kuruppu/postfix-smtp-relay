@@ -1,0 +1,21 @@
+# /etc/postfix/client_ip_access
+# Controls which client IPs are allowed to connect and send through this relay.
+# Format: network/host ACTION
+#
+# Actions: OK, REJECT, DUNNO, HOLD, DISCARD
+#
+# Examples:
+#   192.168.1.0/24         OK       # Allow entire subnet
+#   10.0.0.50              OK       # Allow a single host
+#   172.16.0.0/12          REJECT   # Block a range
+#
+# After editing, rebuild the hash map and reload Postfix:
+#   sudo postmap /etc/postfix/client_ip_access
+#   sudo systemctl reload postfix
+
+# Allow specific client IPs or subnets
+# 192.168.1.0/24          OK
+# 10.0.0.50               OK
+
+# Reject everything else (uncomment to enforce a strict allowlist)
+# 0.0.0.0/0               REJECT Connection refused — IP not authorized

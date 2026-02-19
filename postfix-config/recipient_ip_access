@@ -1,0 +1,20 @@
+# /etc/postfix/recipient_ip_access
+# Controls which destination mail-server IPs are allowed when relaying.
+# Applied via smtp_destination_restrictions or transport maps.
+# Format: network/host ACTION
+#
+# Actions: OK, REJECT, DUNNO, HOLD, DISCARD
+#
+# Examples:
+#   203.0.113.0/24         OK       # Allow delivery to this range
+#   198.51.100.10          REJECT   # Block a specific server
+#
+# After editing, rebuild the hash map and reload Postfix:
+#   sudo postmap /etc/postfix/recipient_ip_access
+#   sudo systemctl reload postfix
+
+# Allow specific destination IPs or subnets
+# 203.0.113.0/24          OK
+
+# Reject specific destination IPs
+# 198.51.100.10           REJECT Delivery to this IP is not allowed
