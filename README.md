@@ -13,11 +13,11 @@ flowchart LR
     end
 
     subgraph Server["Ubuntu Server"]
-        D[("Postfix\nSMTP Relay\nPort 25")]
+        D[("Postfix SMTP Relay : Port 25")]
     end
 
     subgraph External["External SMTP Provider"]
-        E[("Gmail / SendGrid / Mailgun / SES / Port 587")]
+        E[("Gmail / SendGrid / Mailgun / SES on Port 587")]
     end
 
     subgraph Recipients["Recipients"]
