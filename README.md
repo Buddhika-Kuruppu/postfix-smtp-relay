@@ -17,7 +17,7 @@ flowchart LR
     end
 
     subgraph External["External SMTP Provider"]
-        E[("Gmail / SendGrid\nMailgun / SES\nPort 587")]
+        E[("Gmail / SendGrid / Mailgun / SES / Port 587")]
     end
 
     subgraph Recipients["Recipients"]
